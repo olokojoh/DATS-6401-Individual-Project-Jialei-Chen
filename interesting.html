@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Visualization of Complex Data - Project 1">
+  <meta name="author" content="Jialei Chen">
+
+  <title>Visualization of Complex Data - Project 1</title>
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+  <script>
+    google.charts.load('current', {'packages': ['corechart', 'geochart']}); //must add GeoChart
+    google.charts.setOnLoadCallback(drawAllSheets);
+
+    function drawAllSheets(){
+        drawSheetName('gdp_growth', 'SELECT A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U', gdp_annualGrowth_trendResponseHandler );
+        drawSheetName('gdp_growth', 'SELECT W,X', annualGrowthRateRankResponseHandler);
+        drawSheetName('trend', 'SELECT A,O,P,Q', AllResponseHandler);
+        drawSheetName('trend', 'SELECT A,K,L,M', CorrGHMResponseHandler);
+
+    } //drawAllSheets
+
+    function drawSheetName(sheetName, query, responseHandler){
+            var queryString = encodeURIComponent(query);
+            var query = new google.visualization.Query(
+                'https://docs.google.com/spreadsheets/d/1d_BaxZHXWFiTTMxhRg7jhHcA0GSprz9X4ZlJ29QNxO4/gviz/tq?sheet='
+                + sheetName + '&headers=1&tq=' + queryString);
+            query.send(responseHandler);
+        } //drawSheetName
+
+    function checkError(response) {
+        if (response.isError()) {
+            alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage())
+            return;
+        }
+    } //checkError
+
+    function checkError(response) {
+            if (response.isError()) {
+                alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage())
+                return;
+            }
+    } //checkError
+
+    function gdp_annualGrowth_trendResponseHandler(response) {
+        checkError(response);
+        var data = response.getDataTable();
+        var options = {
+        title: 'GDP Trends from 2011 to 2017',	
+        chartArea:{left:200,width:'100%',right:200},
+        legend: { position: 'right' }};
+
+        var chart = new google.visualization.LineChart(document.getElementById('gdp_trend'));
+        chart.draw(data, options);
+    }
+
+    function annualGrowthRateRankResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable()
+            data.sort({column: 1, desc: true});
+
+            var options = {
+                legend: 'none',
+                bars: 'horizontal',
+                annotations: {alwaysOutside: true},
+                title: 'Average annual growth in %',
+                vAxis: {title: 'Country'},
+                hAxis: {title: 'Average growth rate (%)'}
+            };
+
+            /* using a view */
+            var view = new google.visualization.DataView(data);
+            view.setColumns([0,1, {
+                    calc: function(dt, row){
+                        return Math.round(dt.getFormattedValue(row,1)*100)/100 + '%';
+                    },
+                    sourceColumn: 1,
+                    type: 'string',
+                    role: 'annotation'
+            }]);
+
+            var chart = new google.visualization.BarChart(document.getElementById('avg_growth_rank'));
+            chart.draw(view, options);
+    } //annualGrowthRateRankResponseHandler
+
+    function AllResponseHandler(response) {
+        var data = response.getDataTable();
+
+        var options = {
+            width: 1200,
+            height: 700,
+            legend: {position: 'top', maxLines: 1},
+            bar: {groupWidth: '75%'},
+            isStacked: true
+        };
+
+        var chart = new google.visualization.BarChart(
+            document.getElementById("Compare_all"));
+        chart.draw(data, options);
+    }  //AllResponseHandler
+
+    function CorrGHMResponseHandler(response) {
+
+        var data = response.getDataTable();
+
+        var options = {
+
+            title: 'Health as % of GDP and Military as % of GDP associate with Average growth rate',
+            hAxis: {title: 'Healthcare as % of GDP'},
+                vAxis: {title: 'Military as % of GDP'},
+                bubble: {textStyle: {fontSize: 10,auraColor: 'none'}}      };
+
+        var chart = new google.visualization.BubbleChart(document.getElementById('correlation'));
+        chart.draw(data, options);
+    }
+
+
+</script>
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/style.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand js-scroll-trigger" href="#page-top">Guide</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="index.html">Overview</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="education.html">Education</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="healthcare.html">Healthcare</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="military.html">Military</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="interesting.html">Exploratory</a>
+          </li>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="bg-primary text-white">
+    <div class="container text-center">
+      <h1>Analysis of G20 Countries</h1>
+      <p class="lead">- education, healthcare and military spending</p>
+    </div>
+  </header>
+
+  <section id="about" class="bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-10 mx-auto">
+          <h2>Exploratory analysis</h2>
+          <p class="note" id="introduction">Here we explore some interesting trends or relationships between G20 countries.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="gdpannualgrowth">
+    <div class="container text-center">
+      <h2>GDP Trends for G20 Countries</h2>
+      <div id="gdp_trend" class="container text-center" style="width: 1200px; height: 900px;"></div>
+      <p class="font-italic">Note: Annual growth rate trend of all G20 countries.</p>
+    </div>
+  </section>
+
+  <section id="gdprank">
+    <div class="container text-center">
+      <h2>GDP annual growth rate rank for G20 Countries</h2>
+      <div id="avg_growth_rank" class="container text-center" style="width: 1200px; height: 900px;"></div>
+      <p class="font-italic">Note: Average annual growth rate rank list.</p>
+    </div>
+  </section>
+
+  <section id="eda" class="bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-10 mx-auto">
+          <h2>Fastest growing VS Slowest growing</h2>
+          <p class="note" id="introduction">Explore the different between 5 fastest growing countries and 5 slowest growing countries.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="gdp">
+    <div class="container text-center">
+      <h2>GDP, Healthcare Spending and Military Spending growth in absolute value on average</h2>
+      <div id="Compare_all" class="container text-center" style="width: 1200px; height: 700px;"></div>
+      <p class="font-italic">Note: Generally, fastest growing group tend to have positive growth on gdp, healthcare spending and military spending.</p>
+    </div>
+  </section>
+
+  <section id="gdp">
+    <div class="container text-center">
+      <h2>Correlation Chart of Health, Military and GDP</h2>
+      <div id="correlation" class="container text-center" style="width: 1200px; height: 900px;"></div>
+      <p class="font-italic">Note: The the fastest group and slowest group are obviously separate from each other.</p>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer class="py-5 bg-dark">
+    <div class="container">
+      <p class="m-0 text-center text-white"> Author: Jialei Chen, Instructor: Nima Zahadat</p>
+    </div>
+    <!-- /.container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Plugin JavaScript -->
+  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <!-- Custom JavaScript for this theme -->
+  <script src="js/scrolling-nav.js"></script>
+
+</body>
+
+</html>

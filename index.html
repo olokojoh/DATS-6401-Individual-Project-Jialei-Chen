@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Visualization of Complex Data - Project 1">
+  <meta name="author" content="Jialei Chen">
+
+  <title>Visualization of Complex Data - Project 1</title>
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+  <script>
+    google.charts.load('current', {'packages': ['corechart', 'geochart']}); //must add GeoChart
+    google.charts.setOnLoadCallback(drawAllSheets);
+
+    function drawAllSheets(){
+        drawSheetName('gdp', 'SELECT A,B,C,D,E,F,G,H', gdpResponseHandler);
+        drawSheetName('expense', 'SELECT J,K,L,M,N,O,P,Q', ExpenseResponseHandler);
+        drawSheetName('health_spending', 'SELECT A,B,C,D,E,F,G,H', HealthResponseHandler);
+        drawSheetName('education_spending', 'SELECT J,Q', EducationResponseHandler);
+        drawSheetName('military_spending', 'SELECT J,Q', MilitaryResponseHandler);
+        drawSheetName('compare_all', 'SELECT A,B,C,D', AllResponseHandler);
+    } //drawAllSheets
+
+    function drawSheetName(sheetName, query, responseHandler){
+            var queryString = encodeURIComponent(query);
+            var query = new google.visualization.Query(
+                'https://docs.google.com/spreadsheets/d/1d_BaxZHXWFiTTMxhRg7jhHcA0GSprz9X4ZlJ29QNxO4/gviz/tq?sheet='
+                + sheetName + '&headers=1&tq=' + queryString);
+            query.send(responseHandler);
+        } //drawSheetName
+
+    function checkError(response) {
+        if (response.isError()) {
+            alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage())
+            return;
+        }
+    } //checkError
+
+    function gdpResponseHandler(response) {
+        checkError(response);
+        var data = response.getDataTable();
+        data.sort({column: 5, desc:true});
+
+        var options = {
+            vAxis: {title: 'Spending in Billions ($)'},
+            hAxis: {title: 'Country'}
+        };
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('gdpTopCountries'));
+        chart.draw(data, options);
+    } //gdpResponseHandler
+
+    function ExpenseResponseHandler(response) {
+        checkError(response);
+        var data = response.getDataTable();
+        data.sort({column: 5, desc:true});
+
+        var options = {
+            vAxis: {title: 'Spending in Billions ($)'},
+            hAxis: {title: 'Country'}
+        };
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('ExpenseTopCountries'));
+        chart.draw(data, options);
+    } //ExpenseResponseHandler
+
+    function HealthResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+            data.sort({column: 5, desc: true});
+
+            var options = {
+                legend: {position: 'top', maxLines: 2},
+                bar: {groupWidth: '75%'},
+                isStacked: true
+            };
+
+            var chart = new google.visualization.BarChart(document.getElementById('Health_spendingTopCountries'));
+            chart.draw(data, options);
+    } //HealthResponseHandler
+
+    function  MilitaryResponseHandler(response) {
+        var data = response.getDataTable();
+        data.sort({column: 1, desc: true});
+
+        var options = {
+            height: 400,
+            colorAxis : {colors: ['#e8f192', '#0a3679']}, 
+            title: 'Military Spending of G20 Countries'
+        };
+
+        var chart = new google.visualization.GeoChart(
+            document.getElementById("Military_spendingTopCountries"));
+        chart.draw(data, options);
+    } //MilitaryResponseHandler
+
+    function EducationResponseHandler(response) {
+        var data = response.getDataTable();
+        data.sort({column: 1, desc: true});
+
+        var options = {
+            height: 400,
+            colorAxis : {colors: ['#e8f192', '#0a3679']}, 
+            title: 'Educational Spending of G20 Countries'
+        };
+
+        var chart = new google.visualization.GeoChart(
+            document.getElementById("Education_spendingTopCountries"));
+        chart.draw(data, options);
+    } //EducationResponseHandler
+
+    function AllResponseHandler(response) {
+        var data = response.getDataTable();
+
+        var options = {
+            width: 900,
+            height: 500,
+            legend: {position: 'top', maxLines: 1},
+            bar: {groupWidth: '75%'},
+            isStacked: true
+        };
+
+        var chart = new google.visualization.BarChart(
+            document.getElementById("Compare_all"));
+        chart.draw(data, options);
+    }  //AllResponseHandler
+
+  </script>
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/style.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand js-scroll-trigger" href="#page-top">Guide</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="index.html">Overview</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="education.html">Education</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="healthcare.html">Healthcare</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="military.html">Military</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="interesting.html">Exploratory</a>
+          </li>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="bg-primary text-white">
+    <div class="container text-center">
+      <h1>Analysis of G20 Countries</h1>
+      <p class="lead">- education, healthcare and military spending</p>
+    </div>
+  </header>
+
+  <section id="about" class="bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-10 mx-auto">
+          <h2>About the dataset & project</h2>
+          <p class="note" id="introduction">There are over 190 countries and tons of organizations in the world. One of the most important group is called G20 countries.
+                          G20 countries drive about 85% economic activities and 2/3 population in the world. 
+                          This project is to analyzing educational, healthcare and military spending over G20 countries from year 2011~2017, 
+                          and exploring interesting relationships and trends inside the data. The raw data is basically from <a  href="https://data.worldbank.org/">World Bank Open Data</a>
+                          and <a  href="https://knoema.com/">knoema</a>. 
+                          In particular, data of China and most educational data are poorly represented. 
+                          Countires are removed if the data is not available.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="gdp">
+    <div class="container text-center">
+      <h2>GDP for G20 Countries</h2>
+      <div id="gdpTopCountries" class="container text-center" style="width: 900px; height: 500px;"></div>
+      <p class="font-italic">Note: 10 countries are picked for GDP analysis. Notice that European Union, United States, China are top 3 in absolute values of GDP.</p>
+    </div>
+  </section>
+
+  <section id="expense">
+    <div class="container text-center">
+      <h2>Expense for G20 Countries</h2>
+      <div id="ExpenseTopCountries" class="container text-center" style="width: 900px; height: 500px;"></div>
+      <p class="font-italic">Note: European Union, United States, China are still top 3 in expense (absolute value).</p>
+    </div>
+  </section>
+
+  <section id="health">
+    <div class="container text-center">
+      <h2>Health Spending</h2>
+      <div id="Health_spendingTopCountries" class="container text-center" style="width: 900px; height: 500px;"></div>
+      <p class="font-italic">Note: When it comes to the absolute value of healthcare spending, China's rank dropped to seventh place.</p>
+    </div>
+  </section>
+
+  <section id="education">
+    <div class="container text-center">
+      <h2>Education Spending in 2017</h2>
+      <div id="Education_spendingTopCountries" class="container text-center" style="width: 900px; height: 500px;"></div>
+      <p class="font-italic">Note: Brazil still spent large part of GDP on education even it is a developing country.</p>
+    </div>
+  </section>
+
+  <section id="military">
+    <div class="container text-center">
+      <h2>Military Spending in 2017</h2>
+      <div id="Military_spendingTopCountries" class="container text-center" style="width: 900px; height: 500px;"></div>
+      <p class="font-italic">Note: United States spent 645.6 billions on military which is around 2.7 times China's military speding.</p>
+    </div>
+  </section>
+
+  <section id="compare_all">
+    <div class="container text-center">
+      <h2>Educational, Healthcare and Military</h2>
+      <div id="Compare_all" class="container text-center" style="width: 900px; height: 500px;"></div>
+      <p class="font-italic"></p>
+    </div>
+  </section>
+
+  
+  <!-- Footer -->
+  <footer class="py-5 bg-dark">
+    <div class="container">
+      <p class="m-0 text-center text-white"> Author: Jialei Chen, Instructor: Nima Zahadat</p>
+    </div>
+    <!-- /.container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Plugin JavaScript -->
+  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <!-- Custom JavaScript for this theme -->
+  <script src="js/scrolling-nav.js"></script>
+
+</body>
+
+</html>
